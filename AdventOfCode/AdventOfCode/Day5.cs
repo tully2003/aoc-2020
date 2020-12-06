@@ -11,9 +11,6 @@ namespace AdventOfCode
 	{
 		public static void Execute()
 		{
-			List<Dictionary<string, string>> passports = new List<Dictionary<string, string>>();
-			var passport = new Dictionary<string, string>();
-
 			// part 1
 			var seats = File
 				.ReadAllLines("inputs/Day 5/input.txt")
