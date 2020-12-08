@@ -23,8 +23,10 @@ namespace AdventOfCode
 			//Day5.Execute();
 			//Console.WriteLine(new string('=', 20));
 			//Day6.Execute();
+			//Console.WriteLine(new string('=', 20));
+			//Day7.Execute();
 			Console.WriteLine(new string('=', 20));
-			Day7.Execute();
+			Day8.Execute();
 		}
 	}
 }
