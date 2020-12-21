@@ -37,8 +37,8 @@ namespace AdventOfCode.Tests
 			[InlineData("1 + (2 * 4)", "(1 + (2 * 4))")]
 			[InlineData("2 * 3 + (4 * 5)", "2 * (3 + (4 * 5))")]
 			[InlineData("(1 + (2 * 4))", "((1 + (2 * 4)))")]
-			[InlineData("1 + 2 + 3", "((1 + 2) + 3))")]
-			[InlineData("1 + (2 + 3)", "((1 + 2) + 3)")]
+			[InlineData("1 + 2 + 3", "((1 + 2) + 3)")]
+			[InlineData("1 + (2 + 3)", "(1 + ((2 + 3)))")]
 			[InlineData("1 + (2 + 3 + 4)", "(1 + (((2 + 3) + 4)))")]
 			[InlineData("5 + (8 * 3 + 9 + 3 * 4 * 3)", "(5 + (8 * ((3 + 9) + 3) * 4 * 3))")]
 			public void Test(string expression, string expected)
