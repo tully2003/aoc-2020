@@ -12,7 +12,7 @@
     <None Update="Inputs\Day 13\input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Inputs\Day 14\input.test.part2.txt">
+    <None Update="Inputs\Day 14\input.2.test.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Inputs\Day 14\input.txt">

@@ -14,7 +14,7 @@ namespace AdventOfCode
 		public static void Execute()
 		{
 			var input = File
-				.ReadAllLines("inputs/Day 14/input.test.part2.txt");
+				.ReadAllLines("inputs/Day 14/input.txt");
 
 			SolvePart1(input);
 			SolvePart2(input);
@@ -52,7 +52,7 @@ namespace AdventOfCode
 
 		public static void SolvePart2(string[] input)
 		{
-			Dictionary<ulong, ulong> memory = new Dictionary<ulong, ulong>();
+			Dictionary<long, long> memory = new Dictionary<long, long>();
 			string mask = new string('X', 36);
 
 			foreach (string line in input)
@@ -67,8 +67,8 @@ namespace AdventOfCode
 				var memMatch = s_memoryRegex.Match(line);
 				if (memMatch.Success)
 				{
-					ulong address = ulong.Parse(memMatch.Groups["address"].Value);
-					ulong value = ulong.Parse(memMatch.Groups["value"].Value);
+					long address = long.Parse(memMatch.Groups["address"].Value);
+					long value = long.Parse(memMatch.Groups["value"].Value);
 
 					var addresses = GetAddressesToWriteTo(mask, address);
 					foreach (var addr in addresses)
@@ -81,38 +81,32 @@ namespace AdventOfCode
 			Console.WriteLine($"{memory.Values.Sum(x => (decimal)x)}");
 		}
 
-		public static IEnumerable<ulong> GetAddressesToWriteTo(string mask, ulong address)
+		public static IEnumerable<long> GetAddressesToWriteTo(string mask, long address)
 		{
 			// first we have to generate all addresses
-			// you're actually generating masks?
-			Stack<string> s = new Stack<string>();
-			s.Push(DecoderChipV2.ApplyMask(mask, address));
-
+			Stack<string> stack = new Stack<string>();
 			List<string> addresses = new List<string>();
-			while (s.Count > 0)
+			stack.Push(DecoderChipV2.ApplyMask(mask, address));
+
+			while (stack.Count > 0)
 			{
-				string current = s.Pop();
+				string current = stack.Pop();
 				int index = current.IndexOf('X');
 				if (index > -1)
 				{
 					char[] chars = current.ToCharArray();
 					chars[index] = '0';
-					s.Push(new string(chars));
+					stack.Push(new string(chars));
 					chars[index] = '1';
-					s.Push(new string(chars));
+					stack.Push(new string(chars));
 				}
 				else
 				{
-					masks.Add(current);
+					addresses.Add(current);
 				}
 			}
 
-			List<ulong> addresses = new List<ulong>();
-			foreach (string msk in masks)
-			{
-				addresses.Add();
-			}
-			return addresses;
+			return addresses.Select(x => Convert.ToInt64(x, 2));
 		}
 
 		public class DecoderChipV1
@@ -141,16 +135,18 @@ namespace AdventOfCode
 
 		public class DecoderChipV2
 		{
-			public static string ApplyMask(string mask, ulong value)
+			public static string ApplyMask(string mask, long address)
 			{
-				char[] chars = mask.ToCharArray();
+				// so we need to convert the value into the new mask?
+				char[] binaryAddress = Convert.ToString(address, 2).PadLeft(36, '0').ToCharArray();
+
 				for (int i = 0; i < mask.Length; i++)
 				{
-					if (mask[i] == '1')
-						value = ChangeBit(value, mask.Length - 1 - i, true);
+					if (mask[i] == '1' || mask[i] == 'X')
+						binaryAddress[i] = mask[i];
 				}
 
-				return value;
+				return new string(binaryAddress);
 			}
 		}
 	}
