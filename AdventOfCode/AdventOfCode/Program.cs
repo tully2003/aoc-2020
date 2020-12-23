@@ -38,19 +38,21 @@ namespace AdventOfCode
             //Console.WriteLine(new string('=', 20));
             //Day15.Execute();
             //Console.WriteLine(new string('=', 20));
-            Day16.Execute();
-            Console.WriteLine(new string('=', 20));
+            //Day16.Execute();
+            //Console.WriteLine(new string('=', 20));
             //Day17.Execute();
             //Console.WriteLine(new string('=', 20));
             //Day18.Execute();
             //Console.WriteLine(new string('=', 20));
             //Day19.Execute();
-            //Console.WriteLine(new string('=', 20));
+            //Console.WriteLine(new stkring('=', 20));
             //Day20.Execute();
             //Console.WriteLine(new string('=', 20));
             //Day21.Execute();
             //Console.WriteLine(new string('=', 20));
             //Day22.Execute();
+            Console.WriteLine(new string('=', 20));
+            Day23.Execute();
         }
     }
 }
