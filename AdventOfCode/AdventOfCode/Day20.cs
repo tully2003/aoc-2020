@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace AdventOfCode
 {
-	public class Day20
+    public class Day20
 	{
 		public static void Execute()
 		{
 			var input = File
-				.ReadAllText("inputs/Day 20/input.test.txt")
+				.ReadAllText("inputs/Day 20/input.txt")
 				.Split("\r\n\r\n", StringSplitOptions.RemoveEmptyEntries)
 				.Select(s =>
 				{
-					var elements = s.Split("\r\n");
+                    var elements = s.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
 
-					return new Tile
+                    return new Tile
 					{
 						Number = int.Parse(elements[0].Split(' ')[1].Trim(':')),
 						Image = elements[1..].Select(x => x.ToCharArray()).ToArray()
@@ -32,7 +31,7 @@ namespace AdventOfCode
 
 		private static Tile[][] SolvePart1(IEnumerable<Tile> tiles)
         {
-			OutputTiles(tiles);
+			//OutputTiles(tiles);
 
             Tile[][] grid = CreateEmptyGrid(tiles);
             if (!GenerateValidGrid(grid, 0, 0, tiles.ToList()))
@@ -41,7 +40,7 @@ namespace AdventOfCode
                 return null;
             }
 
-            OutputGrid(grid);
+            //OutputGrid(grid);
             Console.WriteLine("Part 1 ------------");
 			Console.WriteLine("What do you get if you multiply together the IDs of the four corner tiles?");
 			Console.WriteLine($"{grid[0][0].Number} * {grid[0][grid.Length - 1].Number} * {grid[grid.Length - 1][0].Number} * {grid[grid.Length-1][grid.Length - 1].Number}");
@@ -79,14 +78,14 @@ namespace AdventOfCode
 
             foreach (var img in GenerateArrangements(image))
             {
-                // draw image
-                for (int row = 0; row < img.Length; row++)
-                {
-                    Console.Write(string.Join('\0', img[row]) + " ");
-                    Console.WriteLine();
-                }
+                int seaMonsters = CountSeaMonsters(img);
 
-                Console.WriteLine();
+                if (seaMonsters > 0)
+                {
+                    Console.WriteLine("How many # are not part of a sea monster?");
+                    Console.WriteLine(img.Sum(x => x.Count(y => y == '#')) - (seaMonsters*15));
+                    break;
+                }
             }
         }
 
@@ -221,84 +220,6 @@ namespace AdventOfCode
             }
         }
 
-        [DebuggerDisplay("{DebuggerDisplay,nq}")]
-        private class Tile
-        {
-            public long Number { get; set; }
-
-            public char[][] Image { get; set; }
-
-			public IEnumerable<Tile> GenerateArrangements()
-            {
-				yield return this;
-				Tile current = this;
-				for (int i = 0; i < 3; i++)
-                {
-					current = current.Rotate();
-					yield return current;
-                }
-
-				current = this.Flip();
-				yield return current;
-				for (int i = 0; i < 3; i++)
-				{
-					current = current.Rotate();
-					yield return current;
-				}
-			}
-
-			private Tile Rotate()
-            {
-				var tile = Clone();
-
-				char[][] image = new char[tile.Image.Length][];
-
-				for (int i = 0; i < tile.Image.Length; ++i)
-				{
-					for (int j = 0; j < tile.Image.Length; ++j)
-					{
-						if (image[i] == null) image[i] = new char[tile.Image.Length];
-						image[i][j] = tile.Image[tile.Image.Length - j - 1][i];
-					}
-				}
-				
-				tile.Image = image;
-				return tile;
-			}
-
-			private Tile Flip()
-			{
-				var tile = Clone();
-
-				int top = 0, bottom = tile.Image.Length-1;
-				while (top < bottom)
-                {
-					for(int col = 0; col < tile.Image.Length; col++)
-                    {
-						char temp = tile.Image[top][col];
-						tile.Image[top][col] = tile.Image[bottom][col];
-						tile.Image[bottom][col] = temp;
-					}
-
-					top++;
-					bottom--;
-                }
-
-				return tile;
-			}
-
-			private Tile Clone()
-            {
-				return new Tile
-				{
-					Number = Number,
-					Image = Image.Select(c => c.ToArray()).ToArray()
-				};
-            }
-
-            private string DebuggerDisplay => $"{Number}";
-        }
-
         private static IEnumerable<char[][]> GenerateArrangements(char[][] image)
         {
             yield return image;
@@ -355,6 +276,92 @@ namespace AdventOfCode
             }
 
             return flipped;
+        }
+
+        private static int CountSeaMonsters(char[][] image)
+        {
+            (int row, int col)[] seaMonsterTemplate = new[]
+            {
+                (0, 18),
+                (1, 0), (1, 5), (1, 6), (1, 11), (1, 12), (1, 17), (1, 18), (1, 19),
+                (2, 1), (2, 4), (2, 7), (2, 10), (2, 13), (2, 16)
+            };
+
+            int count = 0;
+            for (int row = 0; row < image.Length-2; row++)
+            {
+                for (int col = 0; col < image[row].Length-19; col++)
+                {
+                    if (IsSeaMonster(row, col))
+                        count++;
+                }
+            }
+            return count;
+
+            bool IsSeaMonster(int row, int col)
+            {
+                for(int i = 0; i < seaMonsterTemplate.Length; i++)
+                {
+                    (int r, int c) = seaMonsterTemplate[i];
+
+                    if (image[row + r][col + c] != '#')
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        [DebuggerDisplay("{DebuggerDisplay,nq}")]
+        private class Tile
+        {
+            public long Number { get; set; }
+
+            public char[][] Image { get; set; }
+
+            public IEnumerable<Tile> GenerateArrangements()
+            {
+                yield return this;
+                Tile current = this;
+                for (int i = 0; i < 3; i++)
+                {
+                    current = current.Rotate();
+                    yield return current;
+                }
+
+                current = Flip();
+                yield return current;
+                for (int i = 0; i < 3; i++)
+                {
+                    current = current.Rotate();
+                    yield return current;
+                }
+            }
+
+            private Tile Rotate()
+            {
+                var tile = Clone();
+                tile.Image = Day20.Rotate(tile.Image);
+                return tile;
+            }
+
+            private Tile Flip()
+            {
+                var tile = Clone();
+                tile.Image = Day20.Flip(tile.Image);
+                return tile;
+            }
+
+            private Tile Clone()
+            {
+                return new Tile
+                {
+                    Number = Number,
+                    Image = Image.Select(c => c.ToArray()).ToArray()
+                };
+            }
+
+            private string DebuggerDisplay => $"{Number}";
         }
     }
 }
